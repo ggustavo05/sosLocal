@@ -57,3 +57,45 @@ export default function AuthScreen({ onLoginSuccess }: AuthScreenProps) {
   );
 }
 
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#D9D9D9',
+  },
+  tabContainer: {
+    flexDirection: 'row',
+    backgroundColor: '#fff',
+    marginHorizontal: 20,
+    marginTop: 20,
+    borderRadius: 15,
+    padding: 5,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3,
+  },
+  tab: {
+    flex: 1,
+    paddingVertical: 15,
+    alignItems: 'center',
+    borderRadius: 10,
+  },
+  activeTab: {
+    backgroundColor: '#1B547D',
+  },
+  tabText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#666',
+  },
+  activeTabText: {
+    color: '#fff',
+  },
+  contentContainer: {
+    flex: 1,
+  },
+});
