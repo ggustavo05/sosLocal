@@ -22,3 +22,33 @@ export default function Header({ onLogout }: HeaderProps) {
   );
 }
 
+const styles = StyleSheet.create({
+  header: {
+    backgroundColor: '#1B547D',
+    paddingTop: 20,
+    paddingBottom: 20,
+    paddingHorizontal: 20,
+  },
+  headerContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative',
+  },
+  logoIcon: {
+    marginRight: 10,
+  },
+  headerTitle: {
+    color: '#fff',
+    fontSize: 20,
+    fontWeight: 'bold',
+    letterSpacing: 1,
+  },
+  logoutButton: {
+    position: 'absolute',
+    right: 0,
+    padding: 8,
+  },
+});
+
+
