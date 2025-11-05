@@ -1,0 +1,29 @@
+import React from 'react';
+import { View, StyleSheet, ScrollView, SafeAreaView } from 'react-native';
+import Header from '../components/common/Header';
+import CepSection from '../components/home/CepSection';
+import GuidanceSection from '../components/home/GuidanceSection';
+import MapSection from '../components/home/MapSection';
+import RiskAreaSection from '../components/home/RisckAreaSection';
+
+interface HomeScreenProps {
+  onLogout: () => void;
+}
+
+export default function HomeScreen({ onLogout }: HomeScreenProps) {
+  return (
+    <SafeAreaView style={styles.container}>
+      <Header onLogout={onLogout} />
+      <ScrollView 
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        <CepSection />
+        <GuidanceSection />
+        <MapSection />
+        <RiskAreaSection />
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
