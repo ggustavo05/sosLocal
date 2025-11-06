@@ -6,8 +6,8 @@ import {
   Text,
   Dimensions,
 } from 'react-native';
-import LoginScreen from '../components/auth/LoginScreen';
-import RegisterScreen from '../components/auth/RegisterScreen';
+import LoginScreen from '../app/logintela';
+import RegisterScreen from '../app/cadastrotela';
 
 const { width } = Dimensions.get('window');
 
