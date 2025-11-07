@@ -13,18 +13,6 @@ O aplicativo busca simular um sistema de alerta regional simples, unindo **IoT**
 
 ---
 
-## 🧩 **Funcionalidades Implementadas**
-
-| Requisito | Descrição | Pontuação |
-|------------|------------|-----------|
-| **Navegação entre telas** | Utiliza o **Expo Router** para navegação entre as telas principais (`index.tsx`, `orientacoes.tsx`, `adicionar-area.tsx`). | 30 pts |
-| **Protótipo visual funcional** | Layout inspirado em aplicativos reais, com cabeçalho, botões interativos e área de mapa. | 30 pts |
-| **Formulário com manipulação de dados** | Formulário funcional na tela “Adicionar Área”, controlado por `useState`, com exibição dinâmica das áreas cadastradas. | 20 pts |
-| **Armazenamento local** | Uso de `AsyncStorage` para salvar, recuperar e limpar os dados mesmo após reiniciar o app. | 20 pts |
-
-
----
-
 ## 🧠 **Tecnologias Utilizadas**
 
 - ⚛️ **React Native** — base do aplicativo.
