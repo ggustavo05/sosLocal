@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert, ActivityIndicator, Modal, TextInput, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import smsService from '../../src/services/smsService';
 
 // Mensagem padrão de emergência
@@ -22,12 +23,71 @@ const EMERGENCY_TYPES = [
 ];
 
 export default function RiskAreaSection() {
-  const [loading, setLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedType, setSelectedType] = useState<number>(1); // Pré-seleciona o primeiro tipo
   const [phoneNumber, setPhoneNumber] = useState(DEFAULT_EMERGENCY_NUMBER.phone);
   const [ddd, setDdd] = useState(DEFAULT_EMERGENCY_NUMBER.ddd);
   const [message, setMessage] = useState(DEFAULT_EMERGENCY_MESSAGE);
+
+  // Obter queryClient para invalidação de cache
+  const queryClient = useQueryClient();
+
+  // Usar TanStack Query useMutation para envio de SMS
+  const smsMutation = useMutation({
+    mutationFn: async (data: {
+      remetente: string;
+      ddd: string;
+      numeroTelefone: string;
+      mensagem: string;
+      idEvento: number;
+    }) => {
+      console.log('📤 Enviando SMS para o servidor (TanStack Query)...');
+      const startTime = Date.now();
+      const response = await smsService.enviarSms(data);
+      const duration = Date.now() - startTime;
+      return { ...response, duration };
+    },
+    onSuccess: (data, variables) => {
+      const selectedTypeName = EMERGENCY_TYPES.find(t => t.id === variables.idEvento)?.name || 'Desconhecido';
+      
+      console.log('✅ SMS ENVIADO COM SUCESSO!');
+      console.log('Tempo de resposta:', `${data.duration}ms`);
+      console.log('Dados da resposta:', JSON.stringify(data.data, null, 2));
+      
+      // Invalidar cache de áreas de risco para atualizar o mapa
+      console.log('🔄 Invalidando cache de áreas de risco...');
+      queryClient.invalidateQueries({ queryKey: ['riskAreas'] });
+      
+      // Invalidar cache de SMS (se houver lista de SMS no futuro)
+      queryClient.invalidateQueries({ queryKey: ['sms'] });
+      
+      console.log('✅ Cache invalidado - dados serão atualizados automaticamente');
+      console.log('==========================================');
+      
+      Alert.alert(
+        '✅ SMS Enviado!',
+        `Sua mensagem de emergência foi enviada com sucesso!\n\n📱 Destino: +55 ${variables.ddd} ${variables.numeroTelefone}\n⚠️ Tipo: ${selectedTypeName}\n⏱️ Tempo: ${data.duration}ms\n\nAjuda está a caminho!`,
+        [{
+          text: 'OK',
+          onPress: () => {
+            console.log('Popup de confirmação fechado');
+          }
+        }]
+      );
+    },
+    onError: (error: any) => {
+      console.error('❌ EXCEÇÃO AO ENVIAR SMS');
+      console.error('Tipo de erro:', error instanceof Error ? error.name : 'Unknown');
+      console.error('Mensagem:', error instanceof Error ? error.message : String(error));
+      console.error('Stack:', error instanceof Error ? error.stack : 'N/A');
+      console.error('==========================================');
+      
+      Alert.alert(
+        '❌ Erro de Conexão',
+        'Não foi possível conectar ao servidor. Verifique sua internet e tente novamente.'
+      );
+    },
+  });
 
   const handleSendSMS = () => {
     // Reseta campos com valores padrão e abre o modal
@@ -83,67 +143,18 @@ export default function RiskAreaSection() {
         },
         {
           text: 'Enviar',
-          onPress: async () => {
+          onPress: () => {
             // Fecha o modal ANTES de iniciar o envio
             setModalVisible(false);
             
-            setLoading(true);
-            console.log('📤 Enviando SMS para o servidor...');
-
-            try {
-              const startTime = Date.now();
-              const response = await smsService.enviarSms({
-                remetente: 'SOS Localiza - Emergência',
-                ddd: ddd.trim(),
-                numeroTelefone: phoneNumber.trim(),
-                mensagem: message.trim(),
-                idEvento: selectedType,
-              });
-              const endTime = Date.now();
-              const duration = endTime - startTime;
-
-              if (response.success) {
-                console.log('✅ SMS ENVIADO COM SUCESSO!');
-                console.log('Tempo de resposta:', `${duration}ms`);
-                console.log('Dados da resposta:', JSON.stringify(response.data, null, 2));
-                console.log('==========================================');
-                
-                Alert.alert(
-                  '✅ SMS Enviado!',
-                  `Sua mensagem de emergência foi enviada com sucesso!\n\n📱 Destino: +55 ${ddd} ${phoneNumber}\n⚠️ Tipo: ${selectedTypeName}\n⏱️ Tempo: ${duration}ms\n\nAjuda está a caminho!`,
-                  [{
-                    text: 'OK',
-                    onPress: () => {
-                      console.log('Popup de confirmação fechado');
-                    }
-                  }]
-                );
-              } else {
-                console.error('❌ ERRO AO ENVIAR SMS');
-                console.error('Mensagem de erro:', response.message);
-                console.error('Tempo de resposta:', `${duration}ms`);
-                console.error('==========================================');
-                
-                Alert.alert(
-                  '❌ Erro ao Enviar',
-                  response.message || 'Não foi possível enviar o SMS. Tente novamente.'
-                );
-              }
-            } catch (error) {
-              console.error('❌ EXCEÇÃO AO ENVIAR SMS');
-              console.error('Tipo de erro:', error instanceof Error ? error.name : 'Unknown');
-              console.error('Mensagem:', error instanceof Error ? error.message : String(error));
-              console.error('Stack:', error instanceof Error ? error.stack : 'N/A');
-              console.error('==========================================');
-              
-              Alert.alert(
-                '❌ Erro de Conexão',
-                'Não foi possível conectar ao servidor. Verifique sua internet e tente novamente.'
-              );
-            } finally {
-              setLoading(false);
-              console.log('🔄 Processo de envio finalizado');
-            }
+            // Usar mutation do TanStack Query
+            smsMutation.mutate({
+              remetente: 'SOS Localiza - Emergência',
+              ddd: ddd.trim(),
+              numeroTelefone: phoneNumber.trim(),
+              mensagem: message.trim(),
+              idEvento: selectedType,
+            });
           }
         }
       ]
@@ -157,12 +168,12 @@ export default function RiskAreaSection() {
           <Text style={styles.text}>
             Está em uma área de risco? Estamos aqui para ajudar.
           </Text>
-          <TouchableOpacity 
-            style={[styles.button, loading && styles.buttonDisabled]} 
+          <TouchableOpacity
+            style={[styles.button, smsMutation.isPending && styles.buttonDisabled]}
             onPress={handleSendSMS}
-            disabled={loading}
+            disabled={smsMutation.isPending}
           >
-            {loading ? (
+            {smsMutation.isPending ? (
               <ActivityIndicator color="#fff" />
             ) : (
               <>
@@ -292,11 +303,11 @@ export default function RiskAreaSection() {
                   <Text style={styles.cancelButtonText}>Cancelar</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                  style={[styles.sendButton, loading && styles.buttonDisabled]}
+                  style={[styles.sendButton, smsMutation.isPending && styles.buttonDisabled]}
                   onPress={handleConfirmSMS}
-                  disabled={loading}
+                  disabled={smsMutation.isPending}
                 >
-                  {loading ? (
+                  {smsMutation.isPending ? (
                     <ActivityIndicator color="#fff" />
                   ) : (
                     <Text style={styles.sendButtonText}>Enviar</Text>

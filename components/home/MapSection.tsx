@@ -1,5 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { View, StyleSheet, Platform, Text, ActivityIndicator } from 'react-native';
+import { useQuery } from '@tanstack/react-query';
 import riskAreasService from '../../src/services/riskAreasService';
 import { RiskArea } from '../../src/types/riskAreas';
 
@@ -16,35 +17,29 @@ if (Platform.OS !== 'web') {
 export default function MapSection() {
   const mapRef = useRef<any>(null);
   const webViewRef = useRef<any>(null);
-  const [riskAreas, setRiskAreas] = useState<RiskArea[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  // Buscar áreas de risco ao montar o componente
-  useEffect(() => {
-    loadRiskAreas();
-  }, []);
-
-  const loadRiskAreas = async () => {
-    console.log('=== CARREGANDO ÁREAS DE RISCO NO MAPA ===');
-    setLoading(true);
-    setError(null);
-
-    try {
+  // Usar TanStack Query para buscar áreas de risco
+  const {
+    data: riskAreas = [],
+    isLoading: loading,
+    error,
+    isError,
+  } = useQuery({
+    queryKey: ['riskAreas'],
+    queryFn: async () => {
+      console.log('=== CARREGANDO ÁREAS DE RISCO NO MAPA (TanStack Query) ===');
       const areas = await riskAreasService.fetchRiskAreas();
-      setRiskAreas(areas);
       console.log(`✅ ${areas.length} áreas de risco carregadas com sucesso`);
       
       // Estatísticas
       const stats = riskAreasService.getStatistics(areas);
       console.log('📊 Estatísticas:', stats);
-    } catch (err: any) {
-      console.error('❌ Erro ao carregar áreas de risco:', err);
-      setError(err.message || 'Erro ao carregar áreas de risco');
-    } finally {
-      setLoading(false);
-    }
-  };
+      
+      return areas;
+    },
+    staleTime: 1000 * 60 * 5, // 5 minutos
+    retry: 2,
+  });
 
   // Gerar HTML com marcadores de risco
   const generateMapHTML = () => {
@@ -288,9 +283,9 @@ export default function MapSection() {
               <Text style={styles.loadingText}>Carregando áreas de risco...</Text>
             </View>
           )}
-          {error && (
+          {isError && error && (
             <View style={styles.errorContainer}>
-              <Text style={styles.errorText}>❌ {error}</Text>
+              <Text style={styles.errorText}>❌ {error instanceof Error ? error.message : 'Erro ao carregar áreas de risco'}</Text>
             </View>
           )}
           {!loading && !error && (
@@ -352,9 +347,9 @@ export default function MapSection() {
               <Text style={styles.loadingText}>Carregando áreas de risco...</Text>
             </View>
           )}
-          {error && (
+          {isError && error && (
             <View style={styles.errorContainer}>
-              <Text style={styles.errorText}>❌ {error}</Text>
+              <Text style={styles.errorText}>❌ {error instanceof Error ? error.message : 'Erro ao carregar áreas de risco'}</Text>
             </View>
           )}
           {!loading && !error && (
