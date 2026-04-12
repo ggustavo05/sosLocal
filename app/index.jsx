@@ -42,15 +42,14 @@ export default function AuthScreen({ onLoginSuccess }) {
 
       <View style={styles.contentContainer}>
         {activeTab === 'login' ? (
-          <LoginScreen 
-            onSwitchToRegister={() => setActiveTab('register')} 
-            onLoginSuccess={()=>router.replace("/hometela")}
-            
+          <LoginScreen
+            onSwitchToRegister={() => setActiveTab('register')}
+            onLoginSuccess={() => router.replace('/hometela')}
           />
         ) : (
-          <RegisterScreen 
-            onSwitchToLogin={() => setActiveTab('login')} 
-            onRegisterSuccess={onLoginSuccess}
+          <RegisterScreen
+            onSwitchToLogin={() => setActiveTab('login')}
+            onRegisterSuccess={() => router.replace('/hometela')}
           />
         )}
       </View>

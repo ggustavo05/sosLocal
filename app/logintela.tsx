@@ -10,7 +10,9 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  ActivityIndicator,
 } from 'react-native';
+import authService from '../src/services/authService';
 
 interface LoginScreenProps {
   onSwitchToRegister: () => void;
@@ -20,10 +22,36 @@ interface LoginScreenProps {
 export default function LoginScreen({ onSwitchToRegister, onLoginSuccess }: LoginScreenProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = () => {
-    // Vai direto para a tela principal sem validação
-    onLoginSuccess();
+  const handleLogin = async () => {
+    // Validação básica
+    if (!email.trim() || !password.trim()) {
+      Alert.alert('Erro', 'Por favor, preencha todos os campos');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      // Chama o serviço de autenticação
+      const response = await authService.login({
+        username: email.trim(),
+        password: password.trim(),
+      });
+
+      if (response.success) {
+        Alert.alert('Sucesso', 'Login realizado com sucesso!');
+        onLoginSuccess();
+      } else {
+        Alert.alert('Erro', response.message || 'Falha ao fazer login');
+      }
+    } catch (error) {
+      console.error('Erro no login:', error);
+      Alert.alert('Erro', 'Erro ao conectar com o servidor');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -71,8 +99,16 @@ export default function LoginScreen({ onSwitchToRegister, onLoginSuccess }: Logi
             />
           </View>
 
-          <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-            <Text style={styles.loginButtonText}>Entrar</Text>
+          <TouchableOpacity
+            style={[styles.loginButton, loading && styles.loginButtonDisabled]}
+            onPress={handleLogin}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.loginButtonText}>Entrar</Text>
+            )}
           </TouchableOpacity>
 
           <View style={styles.switchContainer}>
@@ -154,6 +190,10 @@ const styles = StyleSheet.create({
     padding: 18,
     alignItems: 'center',
     marginTop: 10,
+  },
+  loginButtonDisabled: {
+    backgroundColor: '#6B8FA3',
+    opacity: 0.7,
   },
   loginButtonText: {
     color: '#fff',
