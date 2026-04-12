@@ -1,7 +1,7 @@
 # 🚨  Protótipo SOS Localiza
 
 Um protótipo funcional desenvolvido em **React Native com Expo**, voltado para auxiliar usuários a se manterem informados sobre **eventos adversos (como enchentes, deslizamentos e emergências climáticas)** em suas regiões.
-O app permite **registrar áreas de interesse pelo CEP**, acessar **orientações de segurança** e visualizar um **mapa interativo** da localidade.
+O app permite **enviar SMS de emergência**, acessar **orientações de segurança** e visualizar um **mapa interativo** da localidade.
 
 ---
 
@@ -96,177 +96,247 @@ Após iniciar o servidor, você terá as seguintes opções:
 
 ---
 
-## 🧭 **Expo Router - Sistema de Navegação**
+## 🔌 **Integração com APIs Backend**
 
-### **O que é Expo Router?**
+O aplicativo **SOS Localiza** integra-se com múltiplas APIs para fornecer funcionalidades completas de autenticação, envio de SMS de emergência e visualização de áreas de risco.
 
-O **Expo Router** é um sistema de navegação baseado em arquivos (file-based routing) para aplicativos React Native com Expo. Ele funciona de forma similar ao Next.js, onde a estrutura de pastas define as rotas da aplicação.
-
-### **Como Funciona no Projeto**
-
-No **SOS Localiza**, o Expo Router está configurado da seguinte forma:
+### **📋 Arquitetura de APIs**
 
 ```
-app/
-├── _layout.tsx          # Layout raiz com Stack Navigator
-├── index.tsx            # Tela inicial (autenticação)
-├── hometela.tsx         # Tela principal do app
-└── orientacoes.tsx      # Tela de orientações
+Frontend (React Native)
+    ↓
+API Services Layer
+    ├── authService.ts (Login/Logout)
+    ├── smsService.ts (Envio de SMS)
+    └── riskAreasService.ts (Áreas de Risco)
+    ↓
+Backend APIs
+    ├── Spring Boot (localhost:8081)
+    │   ├── POST /login
+    │   └── POST /api/sms
+    └── Oracle APEX
+        └── GET /ords/oracle_soslo/risco/areas
 ```
-
-### **Configuração no `_layout.tsx`**
-
-```typescript
-import { Stack } from 'expo-router';
-
-export default function RootLayout() {
-  return (
-    <Stack>
-      <Stack.Screen name="index"/>
-      <Stack.Screen name="hometela"/>
-    </Stack>
-  );
-}
-```
-
-### **Navegação entre Telas**
-
-O projeto utiliza os seguintes métodos de navegação:
-
-1. **`router.push()`** - Navega para uma nova tela (adiciona à pilha)
-
-   ```typescript
-   import { router } from 'expo-router';
-   router.push('/orientacoes');
-   ```
-2. **`router.replace()`** - Substitui a tela atual (não adiciona à pilha)
-
-   ```typescript
-   router.replace('/hometela');
-   ```
-3. **`router.back()`** - Volta para a tela anterior
-
-   ```typescript
-   router.back();
-   ```
-
-### **Vantagens do Expo Router**
-
-- ✅ **Roteamento baseado em arquivos** - Estrutura intuitiva e fácil de entender
-- ✅ **TypeScript nativo** - Suporte completo a tipos e autocomplete
-- ✅ **Deep linking** - Suporte automático a links profundos
-- ✅ **Navegação nativa** - Performance otimizada com componentes nativos
-- ✅ **Integração com Expo** - Funciona perfeitamente com o ecossistema Expo
 
 ---
 
-## 🔄 **Context API - Gerenciamento de Estado**
+### **🔐 API de Login e Autenticação**
 
-### **O que é Context API?**
+#### **Endpoint**
+```
+POST http://localhost:8081/login
+```
 
-A **Context API** é uma funcionalidade nativa do React que permite compartilhar dados entre componentes sem precisar passar props manualmente através de cada nível da árvore de componentes (prop drilling).
+#### **Método de Autenticação**
+O sistema utiliza **HTTP Basic Authentication** com credenciais codificadas em Base64.
 
-### **Como Funciona**
+#### **Como Funciona**
 
-A Context API consiste em três partes principais:
+1. **Usuário insere credenciais** na tela de login
+2. **Frontend cria header Authorization** com formato: `Basic base64(username:password)`
+3. **Backend valida** as credenciais contra o banco de dados
+4. **Resposta de sucesso** retorna status 200
+5. **Credenciais são armazenadas** localmente com AsyncStorage
 
-1. **`createContext()`** - Cria um novo contexto
-2. **`Provider`** - Componente que fornece os dados para os componentes filhos
-3. **`useContext()`** - Hook que consome os dados do contexto
+---
 
-### **Exemplo de Implementação**
+### **📱 API de Cadastro**
 
-Embora o projeto atual não utilize Context API, aqui está um exemplo de como poderia ser implementado para gerenciar o estado de autenticação:
+#### **Endpoint**
+```
+POST http://localhost:8081/api/usuarios/cadastro
+```
 
-```typescript
-// contexts/AuthContext.tsx
-import React, { createContext, useContext, useState } from 'react';
+#### **Como Funciona**
 
-interface AuthContextType {
-  user: User | null;
-  isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  logout: () => void;
-}
+1. **Usuário preenche formulário** de cadastro
+2. **Frontend valida** os dados (email, senha, confirmação)
+3. **Requisição enviada** ao backend com dados do novo usuário
+4. **Backend cria** novo registro no banco de dados
+5. **Resposta de sucesso** permite login automático
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+#### **Exemplo de Payload**
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-
-  const login = async (email: string, password: string) => {
-    // Lógica de autenticação
-    setUser({ email, name: 'Usuário' });
-  };
-
-  const logout = () => {
-    setUser(null);
-  };
-
-  return (
-    <AuthContext.Provider value={{
-      user,
-      isAuthenticated: !!user,
-      login,
-      logout
-    }}>
-      {children}
-    </AuthContext.Provider>
-  );
-}
-
-export function useAuth() {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth deve ser usado dentro de AuthProvider');
-  }
-  return context;
+```json
+{
+  "nome": "João Silva",
+  "email": "joao@email.com",
+  "senha": "senha123",
+  "telefone": "11999999999",
+  "cep": "01310-100"
 }
 ```
 
-### **Uso no Projeto**
+#### **Validações Frontend**
 
-Para usar Context API no projeto, você precisaria:
+```typescript
+// Validações implementadas
+- Email válido (formato)
+- Senha mínima de 6 caracteres
+- Confirmação de senha igual à senha
+- Campos obrigatórios preenchidos
+```
 
-1. **Criar o contexto** em `contexts/AuthContext.tsx`
-2. **Envolver o app** com o Provider no `_layout.tsx`:
-   ```typescript
-   import { AuthProvider } from './contexts/AuthContext';
+---
 
-   export default function RootLayout() {
-     return (
-       <AuthProvider>
-         <Stack>
-           {/* suas telas */}
-         </Stack>
-       </AuthProvider>
-     );
-   }
-   ```
-3. **Consumir o contexto** em qualquer componente:
-   ```typescript
-   import { useAuth } from '../contexts/AuthContext';
+### **📨 API de Envio de SMS (Twilio)**
 
-   export default function HomeScreen() {
-     const { user, logout } = useAuth();
-     // usar user e logout
-   }
-   ```
+#### **Endpoint**
+```
+POST http://localhost:8081/api/sms
+```
 
-### **Quando Usar Context API**
+#### **Como Funciona**
 
-- ✅ **Estado global** - Dados que precisam ser acessados por múltiplos componentes
-- ✅ **Autenticação** - Informações do usuário logado
-- ✅ **Temas** - Configurações de tema/claro/escuro
-- ✅ **Configurações** - Preferências do usuário
+O sistema utiliza **Twilio** para envio de SMS de emergência:
 
-### **Alternativas no Projeto**
+1. **Usuário clica** no botão "Enviar SMS de Emergência"
+2. **Modal abre** com formulário pré-preenchido
+3. **Usuário seleciona** tipo de emergência (Enchente, Deslizamento, etc.)
+4. **Usuário confirma** o envio
+5. **Frontend envia** requisição para backend
+6. **Backend processa** via Twilio API
+7. **SMS é enviado** para o número configurado
+8. **Confirmação** é exibida ao usuário
 
-Atualmente, o projeto utiliza:
+#### **Estrutura da Requisição**
 
-- **Props drilling** - Passagem de props entre componentes
-- **AsyncStorage** - Para persistência de dados locais
-- **useState** - Para estado local de componentes
+```typescript
+// Payload enviado ao backend
+{
+  "numeroDestino": "+5511999999999",
+  "mensagem": "🚨 ALERTA DE EMERGÊNCIA: Enchente detectada na região...",
+  "idEvento": 1  // ID do tipo de emergência
+}
+```
+
+#### **Exemplo de Implementação**
+
+```typescript
+// smsService.ts
+async sendEmergencySMS(data: EmergencySMSData): Promise<SMSResponse> {
+  const credentials = await authService.getStoredCredentials();
+  const authHeader = 'Basic ' + btoa(`${credentials.username}:${credentials.password}`);
+  
+  const response = await fetch(`${API_CONFIG.BASE_URL}/api/sms`, {
+    method: 'POST',
+    headers: {
+      'Authorization': authHeader,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      numeroDestino: data.phoneNumber,
+      mensagem: data.message,
+      idEvento: data.eventType,
+    }),
+  });
+  
+  if (!response.ok) {
+    throw new Error('Falha ao enviar SMS');
+  }
+  
+  return await response.json();
+}
+```
+
+#### **Tipos de Emergência**
+
+```typescript
+const EMERGENCY_TYPES = [
+  { id: 1, name: 'Enchente', description: 'Alagamento ou inundação' },
+  { id: 2, name: 'Deslizamento', description: 'Deslizamento de terra' },
+  { id: 3, name: 'Tempestade', description: 'Tempestade severa' },
+  { id: 4, name: 'Incêndio', description: 'Incêndio florestal ou urbano' },
+  { id: 5, name: 'Outro', description: 'Outra emergência' },
+];
+```
+
+#### **Fluxo Completo**
+
+```
+1. Usuário → Clica "Enviar SMS"
+2. Modal → Abre com formulário
+3. Usuário → Seleciona tipo de emergência
+4. Usuário → Edita número/mensagem (opcional)
+5. Usuário → Clica "Enviar"
+6. Popup → Confirmação "Tem certeza?"
+7. Modal → Fecha imediatamente
+8. Frontend → POST /api/sms
+9. Backend → Processa via Twilio
+10. Twilio → Envia SMS
+```
+
+---
+
+### **🗺️ API Oracle APEX - Áreas de Risco**
+
+#### **Endpoint**
+```
+GET https://oracleapex.com/ords/oracle_soslo/risco/areas
+```
+
+#### **Como Funciona**
+
+A API Oracle APEX fornece dados de áreas de risco previstas para exibição no mapa:
+
+1. **Componente MapSection** monta na tela
+2. **useEffect dispara** busca automática
+3. **Frontend consulta** API Oracle APEX
+4. **API retorna** lista de coordenadas com níveis de risco
+5. **Dados são validados** (lat/lng válidos, risco válido)
+6. **Marcadores coloridos** são plotados no mapa Leaflet
+7. **Usuário interage** clicando nos marcadores
+
+#### **Formato de Resposta**
+
+```json
+[
+  {
+    "latitude": -23.504561,
+    "longitude": -46.638034,
+    "risco_previsto": "alto"
+  },
+  {
+    "latitude": -23.550520,
+    "longitude": -46.633308,
+    "risco_previsto": "medio"
+  },
+  {
+    "latitude": -23.561684,
+    "longitude": -46.656139,
+    "risco_previsto": "baixo"
+  }
+]
+```
+
+#### **Níveis de Risco**
+
+| Nível | Cor | Código Hex | Descrição |
+|-------|-----|------------|-----------|
+| **alto** | 🔴 Vermelho | #dc3545 | Risco elevado - Atenção máxima |
+| **medio** | 🟡 Amarelo | #ffc107 | Risco moderado - Cautela |
+| **baixo** | 🟢 Verde | #28a745 | Risco baixo - Monitoramento |
+
+---
+
+### **🔍 Logs e Debugging**
+
+Todos os serviços implementam logging detalhado:
+
+```javascript
+// Exemplo de logs no console
+=== BUSCANDO ÁREAS DE RISCO DA API ORACLE APEX ===
+URL: https://oracleapex.com/ords/oracle_soslo/risco/areas
+✅ Dados recebidos da API
+✅ 25 áreas de risco válidas encontradas
+📊 Estatísticas: { alto: 8, medio: 12, baixo: 5 }
+
+=== INICIANDO ENVIO DE SMS DE EMERGÊNCIA ===
+Tipo de Emergência: Enchente
+Número de Destino: +55 11 999999999
+Mensagem: 🚨 ALERTA DE EMERGÊNCIA...
+✅ SMS ENVIADO COM SUCESSO!
+```
 
 ---
 
@@ -277,8 +347,11 @@ Atualmente, o projeto utiliza:
 O projeto integra a biblioteca **Leaflet** para exibição de mapas interativos:
 
 - Suporte para web (via DOM direto) e mobile (via WebView)
-- Marcadores e popups personalizados
+- Marcadores coloridos por nível de risco
+- Popups informativos interativos
 - Tiles do OpenStreetMap
+- Zoom automático baseado nas áreas
+- Legenda visual de níveis de risco
 
 ### **Layout Responsivo**
 
@@ -309,7 +382,12 @@ hometela.tsx (Tela Principal)
 - **Tela Home** (`hometela.tsx`): Dashboard principal com seções de orientações, mapa e áreas de risco
 - **Tela Orientações** (`orientacoes.tsx`): Guia completo sobre como agir em situações de enchentes
 
----
+## Vídeo de demonstração
+Segue abaixo o link do vídeo demonstrando o funcionamento do projeto: 
+
+> 🎬 Clique na imagem abaixo para assistir no YouTube
+
+[![Assista ao vídeo](./assets/capa-video.png)](https://youtu.be/s1n1HTfvzBU)
 
 ## 🧑‍💻 **Desenvolvido por**
 
@@ -319,7 +397,6 @@ hometela.tsx (Tela Principal)
 | Bruno Cantacini    | 560242 |
 | Gustavo Gonçalves | 556823 |
 
----
 
 ## 📚 **Recursos e Documentação**
 
