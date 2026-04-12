@@ -3,83 +3,87 @@ import React from 'react';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Header from '../components/common/Header';
 
 export default function OrientacoesTela() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        <View style={styles.header}>
-          <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-            <Ionicons name="arrow-back" size={24} color="#333" />
-          </TouchableOpacity>
-          <Text style={styles.title}>Orientações de Segurança</Text>
-          <View style={styles.placeholder} />
-        </View>
-
-        <ScrollView 
+        <Header showBackButton={true} onBack={() => router.back()} />
+        <ScrollView
           style={styles.scrollView}
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <Ionicons name="water" size={24} color="#1E90FF" />
-              <Text style={styles.sectionTitle}>Orientações para Enchentes</Text>
-            </View>
-            
-            <View style={styles.card}>
-              <Text style={styles.cardTitle}>⚠️ ANTES DA ENCHENTE</Text>
-              <Text style={styles.cardText}>
-                • Mantenha-se informado sobre previsões meteorológicas e alertas da Defesa Civil{'\n'}
-                • Tenha sempre um kit de emergência preparado com água, alimentos não perecíveis, medicamentos, documentos importantes e lanternas{'\n'}
-                • Identifique rotas de fuga e locais seguros em pontos elevados{'\n'}
-                • Proteja objetos de valor e documentos em locais altos{'\n'}
-                • Desligue a energia elétrica e o gás se houver risco iminente
-              </Text>
+            <View style={styles.headerSection}>
+              <Ionicons name="shield-checkmark" size={32} color="#1B547D" />
+              <Text style={styles.mainTitle}>Orientações de Segurança</Text>
+              <Text style={styles.subtitle}>Escolha o tipo de evento para ver as orientações</Text>
             </View>
 
-            <View style={styles.card}>
-              <Text style={styles.cardTitle}>🚨 DURANTE A ENCHENTE</Text>
-              <Text style={styles.cardText}>
-                • Evite áreas alagadas e não tente atravessar ruas ou pontes inundadas{'\n'}
-                • Se estiver em veículo, abandone-o imediatamente e procure um local elevado{'\n'}
-                • Não use equipamentos elétricos em contato com água{'\n'}
-                • Mantenha-se afastado de postes, árvores e estruturas que possam cair{'\n'}
-                • Se estiver em casa, suba para o andar superior ou telhado se necessário{'\n'}
-                • Mantenha a calma e siga as orientações das autoridades
-              </Text>
-            </View>
+            {/* Card Enchentes */}
+            <TouchableOpacity 
+              style={styles.card}
+              onPress={() => router.push('/enchentes')}
+              activeOpacity={0.7}
+            >
+              <View style={styles.cardIcon}>
+                <Ionicons name="water" size={32} color="#1E90FF" />
+              </View>
+              <View style={styles.cardContent}>
+                <Text style={styles.cardTitle}>Enchentes</Text>
+                <Text style={styles.cardDescription}>
+                  Saiba como agir antes, durante e após enchentes
+                </Text>
+              </View>
+              <Ionicons name="chevron-forward" size={24} color="#999" />
+            </TouchableOpacity>
 
-            <View style={styles.card}>
-              <Text style={styles.cardTitle}>🏠 APÓS A ENCHENTE</Text>
-              <Text style={styles.cardText}>
-                • Aguarde a autorização das autoridades antes de retornar à sua residência{'\n'}
-                • Verifique se há danos estruturais antes de entrar{'\n'}
-                • Não use água da torneira até que seja declarada potável{'\n'}
-                • Descarte alimentos que entraram em contato com a água da enchente{'\n'}
-                • Limpe e desinfete áreas afetadas para evitar doenças{'\n'}
-                • Verifique a instalação elétrica antes de religar a energia
-              </Text>
-            </View>
+            {/* Card Tempestades */}
+            <TouchableOpacity 
+              style={styles.card}
+              onPress={() => router.push('/tempestades')}
+              activeOpacity={0.7}
+            >
+              <View style={styles.cardIcon}>
+                <Ionicons name="thunderstorm" size={32} color="#FFD700" />
+              </View>
+              <View style={styles.cardContent}>
+                <Text style={styles.cardTitle}>Tempestades, Raios e Granizo</Text>
+                <Text style={styles.cardDescription}>
+                  Proteção durante tempestades elétricas e granizo
+                </Text>
+              </View>
+              <Ionicons name="chevron-forward" size={24} color="#999" />
+            </TouchableOpacity>
 
-            <View style={styles.card}>
-              <Text style={styles.cardTitle}>📞 NÚMEROS DE EMERGÊNCIA</Text>
-              <Text style={styles.cardText}>
-                • Defesa Civil: 199{'\n'}
-                • Bombeiros: 193{'\n'}
-                • SAMU: 192{'\n'}
-                • Polícia Militar: 190
-              </Text>
-            </View>
+            {/* Card Inundações */}
+            <TouchableOpacity 
+              style={styles.card}
+              onPress={() => router.push('/inundacoes')}
+              activeOpacity={0.7}
+            >
+              <View style={styles.cardIcon}>
+                <Ionicons name="water" size={32} color="#4169E1" />
+              </View>
+              <View style={styles.cardContent}>
+                <Text style={styles.cardTitle}>Inundações</Text>
+                <Text style={styles.cardDescription}>
+                  Orientações para situações de inundação
+                </Text>
+              </View>
+              <Ionicons name="chevron-forward" size={24} color="#999" />
+            </TouchableOpacity>
 
-            <View style={styles.warningCard}>
-              <Ionicons name="warning" size={28} color="#FF6B6B" />
-              <Text style={styles.warningText}>
-                <Text style={styles.warningBold}>IMPORTANTE:</Text> Nunca subestime o poder da água. 
-                Apenas 30 cm de água corrente podem derrubar uma pessoa adulta. 
-                Em caso de emergência, procure sempre ajuda profissional.
-              </Text>
-            </View>
+            {/* Botão Voltar */}
+            <TouchableOpacity 
+              style={styles.backButtonBottom}
+              onPress={() => router.back()}
+            >
+              <Ionicons name="arrow-back" size={20} color="#1B547D" />
+              <Text style={styles.backButtonText}>Voltar para Home</Text>
+            </TouchableOpacity>
           </View>
         </ScrollView>
       </View>
@@ -96,29 +100,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f5f5f5',
   },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 15,
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-  },
-  backButton: {
-    padding: 5,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333',
-    flex: 1,
-    textAlign: 'center',
-  },
-  placeholder: {
-    width: 34,
-  },
   scrollView: {
     flex: 1,
   },
@@ -129,61 +110,81 @@ const styles = StyleSheet.create({
   section: {
     marginBottom: 20,
   },
-  sectionHeader: {
-    flexDirection: 'row',
+  headerSection: {
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 30,
+    marginTop: 20,
   },
-  sectionTitle: {
-    fontSize: 22,
+  mainTitle: {
+    fontSize: 28,
     fontWeight: 'bold',
-    color: '#333',
-    marginLeft: 10,
+    color: '#1B547D',
+    marginTop: 15,
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#666',
+    textAlign: 'center',
+    paddingHorizontal: 20,
   },
   card: {
     backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 18,
+    borderRadius: 15,
+    padding: 20,
     marginBottom: 15,
+    flexDirection: 'row',
+    alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 2,
     },
     shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  cardIcon: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#f8f9fa',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 15,
+  },
+  cardContent: {
+    flex: 1,
   },
   cardTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#1E90FF',
-    marginBottom: 12,
+    color: '#333',
+    marginBottom: 5,
   },
-  cardText: {
-    fontSize: 15,
-    color: '#555',
-    lineHeight: 24,
-  },
-  warningCard: {
-    backgroundColor: '#FFF5F5',
-    borderRadius: 12,
-    padding: 20,
-    marginTop: 10,
-    borderLeftWidth: 4,
-    borderLeftColor: '#FF6B6B',
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-  },
-  warningText: {
-    fontSize: 15,
+  cardDescription: {
+    fontSize: 14,
     color: '#666',
-    lineHeight: 22,
-    marginLeft: 12,
-    flex: 1,
+    lineHeight: 20,
   },
-  warningBold: {
-    fontWeight: 'bold',
-    color: '#FF6B6B',
+  backButtonBottom: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 15,
+    marginTop: 20,
+    borderWidth: 1,
+    borderColor: '#1B547D',
+  },
+  backButtonText: {
+    fontSize: 16,
+    color: '#1B547D',
+    fontWeight: '600',
+    marginLeft: 8,
   },
 });
+
+
