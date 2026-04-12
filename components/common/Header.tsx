@@ -4,18 +4,33 @@ import { Ionicons } from '@expo/vector-icons';
 
 interface HeaderProps {
   onLogout?: () => void;
+  onBack?: () => void;
+  showBackButton?: boolean;
 }
 
-export default function Header({ onLogout }: HeaderProps) {
+export default function Header({ onLogout, onBack, showBackButton }: HeaderProps) {
   return (
     <View style={styles.header}>
       <View style={styles.headerContent}>
-        <Ionicons name="location" size={24} color="#fff" style={styles.logoIcon} />
-        <Text style={styles.headerTitle}>SOS LOCALIZA</Text>
-        {onLogout && (
+        {showBackButton && onBack ? (
+          <TouchableOpacity style={styles.backButton} onPress={onBack}>
+            <Ionicons name="arrow-back" size={24} color="#fff" />
+          </TouchableOpacity>
+        ) : (
+          <View style={styles.placeholder} />
+        )}
+        
+        <View style={styles.titleContainer}>
+          <Ionicons name="location" size={24} color="#fff" style={styles.logoIcon} />
+          <Text style={styles.headerTitle}>SOS LOCALIZA</Text>
+        </View>
+        
+        {onLogout ? (
           <TouchableOpacity style={styles.logoutButton} onPress={onLogout}>
             <Ionicons name="log-out" size={20} color="#fff" />
           </TouchableOpacity>
+        ) : (
+          <View style={styles.placeholder} />
         )}
       </View>
     </View>
@@ -32,8 +47,13 @@ const styles = StyleSheet.create({
   headerContent: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  titleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
     justifyContent: 'center',
-    position: 'relative',
   },
   logoIcon: {
     marginRight: 10,
@@ -44,10 +64,16 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     letterSpacing: 1,
   },
-  logoutButton: {
-    position: 'absolute',
-    right: 0,
+  backButton: {
     padding: 8,
+    width: 40,
+  },
+  logoutButton: {
+    padding: 8,
+    width: 40,
+  },
+  placeholder: {
+    width: 40,
   },
 });
 
