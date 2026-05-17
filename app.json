@@ -13,7 +13,10 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "O SOS Localiza usa sua localização em primeiro plano para exibir mapa e alertas na sua região, quando você permitir."
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -21,13 +24,23 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.anonymous.sosLocal"
+      "package": "com.anonymous.sosLocal",
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "O SOS Localiza usa sua localização para mapa e alertas na sua região, quando você permitir."
+        }
+      ]
     ]
   }
 }

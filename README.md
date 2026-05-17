@@ -111,7 +111,7 @@ API Services Layer
     └── riskAreasService.ts (Áreas de Risco)
     ↓
 Backend APIs
-    ├── Spring Boot (localhost:8081)
+    ├── Spring Boot (localhost:8082, perfil dev)
     │   ├── POST /login
     │   └── POST /api/sms
     └── Oracle APEX
@@ -124,7 +124,7 @@ Backend APIs
 
 #### **Endpoint**
 ```
-POST http://localhost:8081/login
+POST http://localhost:8082/login
 ```
 
 #### **Método de Autenticação**
@@ -144,7 +144,7 @@ O sistema utiliza **HTTP Basic Authentication** com credenciais codificadas em B
 
 #### **Endpoint**
 ```
-POST http://localhost:8081/api/usuarios/cadastro
+POST http://localhost:8082/api/mobile/cadastro
 ```
 
 #### **Como Funciona**
@@ -183,7 +183,7 @@ POST http://localhost:8081/api/usuarios/cadastro
 
 #### **Endpoint**
 ```
-POST http://localhost:8081/api/sms
+POST http://localhost:8082/api/sms
 ```
 
 #### **Como Funciona**

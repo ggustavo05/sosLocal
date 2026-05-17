@@ -1,12 +1,12 @@
 /**
  * Tipos TypeScript para Áreas de Risco
- * API Oracle APEX Integration
+ * Consumo da API Spring SosLocaliza: GET /api/mobile/areas-risco
  */
 
 // Níveis de risco possíveis
 export type RiskLevel = 'alto' | 'medio' | 'baixo';
 
-// Interface para área de risco retornada pela API Oracle APEX
+// Ponto de risco retornado pelo backend
 export interface RiskArea {
   latitude: number;
   longitude: number;

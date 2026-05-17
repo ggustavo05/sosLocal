@@ -1,6 +1,5 @@
 /**
- * Serviço para consumir API Oracle APEX de Áreas de Risco
- * Busca e processa dados de áreas com diferentes níveis de risco
+ * Áreas de risco — consumidas da API Spring (SosLocaliza) /api/mobile/areas-risco
  */
 
 import API_CONFIG from '../config/api';
@@ -11,33 +10,27 @@ class RiskAreasService {
   private timeout: number;
 
   constructor() {
-    this.baseUrl = API_CONFIG.ORACLE_APEX_URL;
+    this.baseUrl = API_CONFIG.BASE_URL;
     this.timeout = API_CONFIG.TIMEOUT.RISK_AREAS;
   }
 
-  /**
-   * Busca todas as áreas de risco da API Oracle APEX
-   * @returns Promise com array de áreas de risco
-   */
   async fetchRiskAreas(): Promise<RiskArea[]> {
-    console.log('=== BUSCANDO ÁREAS DE RISCO DA API ORACLE APEX ===');
-    console.log('URL:', `${this.baseUrl}${API_CONFIG.ENDPOINTS.RISK_AREAS.GET_ALL}`);
+    const url = `${this.baseUrl}${API_CONFIG.ENDPOINTS.MOBILE.AREAS_RISCO}`;
+    console.log('=== BUSCANDO ÁREAS DE RISCO (API Java) ===');
+    console.log('URL:', url);
 
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), this.timeout);
 
-      const response = await fetch(
-        `${this.baseUrl}${API_CONFIG.ENDPOINTS.RISK_AREAS.GET_ALL}`,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-          },
-          signal: controller.signal,
-        }
-      );
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        signal: controller.signal,
+      });
 
       clearTimeout(timeoutId);
 
@@ -46,11 +39,10 @@ class RiskAreasService {
       }
 
       const data = await response.json();
-      console.log('✅ Dados recebidos da API:', data);
+      console.log('Dados recebidos da API:', data);
 
-      // Processar resposta - pode ser array direto ou objeto com items/data
       let areas: RiskArea[] = [];
-      
+
       if (Array.isArray(data)) {
         areas = data;
       } else if (data.items && Array.isArray(data.items)) {
@@ -58,120 +50,79 @@ class RiskAreasService {
       } else if (data.data && Array.isArray(data.data)) {
         areas = data.data;
       } else {
-        console.warn('⚠️ Formato de resposta inesperado:', data);
+        console.warn('Formato de resposta inesperado:', data);
         areas = [];
       }
 
-      // Validar e filtrar áreas válidas
       const validAreas = areas.filter(this.isValidRiskArea);
-      
-      console.log(`✅ ${validAreas.length} áreas de risco válidas encontradas`);
-      console.log('Áreas:', validAreas);
+
+      console.log(`${validAreas.length} áreas de risco válidas encontradas`);
 
       return validAreas;
-
-    } catch (error: any) {
-      if (error.name === 'AbortError') {
-        console.error('❌ Timeout ao buscar áreas de risco');
+    } catch (error: unknown) {
+      const err = error as { name?: string; message?: string };
+      if (err?.name === 'AbortError') {
+        console.error('Timeout ao buscar áreas de risco');
         throw new Error('Timeout: A requisição demorou muito para responder');
       }
-      
-      console.error('❌ Erro ao buscar áreas de risco:', error);
-      throw new Error(`Falha ao buscar áreas de risco: ${error.message}`);
+
+      console.error('Erro ao buscar áreas de risco:', error);
+      throw new Error(`Falha ao buscar áreas de risco: ${err?.message || String(error)}`);
     }
   }
 
-  /**
-   * Valida se uma área de risco possui dados válidos
-   * @param area Área de risco a ser validada
-   * @returns true se válida, false caso contrário
-   */
-  private isValidRiskArea(area: any): area is RiskArea {
+  private isValidRiskArea(area: unknown): area is RiskArea {
     if (!area || typeof area !== 'object') {
       return false;
     }
+    const a = area as Record<string, unknown>;
 
-    const hasValidLatitude = 
-      typeof area.latitude === 'number' && 
-      area.latitude >= -90 && 
-      area.latitude <= 90;
+    const hasValidLatitude =
+      typeof a.latitude === 'number' && (a.latitude as number) >= -90 && (a.latitude as number) <= 90;
 
-    const hasValidLongitude = 
-      typeof area.longitude === 'number' && 
-      area.longitude >= -180 && 
-      area.longitude <= 180;
+    const hasValidLongitude =
+      typeof a.longitude === 'number' &&
+      (a.longitude as number) >= -180 &&
+      (a.longitude as number) <= 180;
 
-    const hasValidRisk = 
-      typeof area.risco_previsto === 'string' &&
-      ['alto', 'medio', 'baixo'].includes(area.risco_previsto.toLowerCase());
+    const hasValidRisk =
+      typeof a.risco_previsto === 'string' &&
+      ['alto', 'medio', 'baixo'].includes((a.risco_previsto as string).toLowerCase());
 
-    const isValid = hasValidLatitude && hasValidLongitude && hasValidRisk;
-
-    if (!isValid) {
-      console.warn('⚠️ Área de risco inválida:', area);
-    }
-
-    return isValid;
+    return hasValidLatitude && hasValidLongitude && hasValidRisk;
   }
 
-  /**
-   * Obtém a configuração de marcador para um nível de risco
-   * @param riskLevel Nível de risco
-   * @returns Configuração do marcador
-   */
   getMarkerConfig(riskLevel: RiskLevel): MarkerConfig {
     const normalizedLevel = riskLevel.toLowerCase() as RiskLevel;
     return RISK_MARKER_CONFIG[normalizedLevel] || RISK_MARKER_CONFIG.medio;
   }
 
-  /**
-   * Obtém a cor do marcador para um nível de risco
-   * @param riskLevel Nível de risco
-   * @returns Cor em formato hexadecimal
-   */
   getRiskColor(riskLevel: RiskLevel): string {
     return this.getMarkerConfig(riskLevel).fillColor;
   }
 
-  /**
-   * Obtém o label do marcador para um nível de risco
-   * @param riskLevel Nível de risco
-   * @returns Label descritivo
-   */
   getRiskLabel(riskLevel: RiskLevel): string {
     return this.getMarkerConfig(riskLevel).label;
   }
 
-  /**
-   * Obtém o emoji do marcador para um nível de risco
-   * @param riskLevel Nível de risco
-   * @returns Emoji representativo
-   */
   getRiskEmoji(riskLevel: RiskLevel): string {
     return this.getMarkerConfig(riskLevel).emoji;
   }
 
-  /**
-   * Agrupa áreas de risco por nível
-   * @param areas Array de áreas de risco
-   * @returns Objeto com áreas agrupadas por nível
-   */
   groupByRiskLevel(areas: RiskArea[]): Record<RiskLevel, RiskArea[]> {
-    return areas.reduce((acc, area) => {
-      const level = area.risco_previsto.toLowerCase() as RiskLevel;
-      if (!acc[level]) {
-        acc[level] = [];
-      }
-      acc[level].push(area);
-      return acc;
-    }, {} as Record<RiskLevel, RiskArea[]>);
+    return areas.reduce(
+      (acc, area) => {
+        const level = area.risco_previsto.toLowerCase() as RiskLevel;
+        if (!acc[level]) {
+          acc[level] = [];
+        }
+        acc[level].push(area);
+        return acc;
+      },
+      {} as Record<RiskLevel, RiskArea[]>
+    );
   }
 
-  /**
-   * Obtém estatísticas das áreas de risco
-   * @param areas Array de áreas de risco
-   * @returns Objeto com contagem por nível
-   */
   getStatistics(areas: RiskArea[]): Record<RiskLevel, number> {
     const grouped = this.groupByRiskLevel(areas);
     return {
@@ -182,7 +133,5 @@ class RiskAreasService {
   }
 }
 
-// Exportar instância única do serviço
 const riskAreasService = new RiskAreasService();
 export default riskAreasService;
-

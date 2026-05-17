@@ -24,8 +24,8 @@ export interface SmsResponse {
 export interface Evento {
   idEvento: number;
   nomeEvento: string;
-  descricaoEvento: string;
-  ativo: boolean;
+  descricaoEvento?: string;
+  ativo?: boolean;
 }
 
 class SmsService {
