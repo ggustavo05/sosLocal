@@ -20,6 +20,7 @@ import {
 } from '../../src/services/currentLocationService';
 import { fetchReverseGeocodeLine } from '../../src/services/reverseGeocodeService';
 import { useTheme } from '../../src/theme';
+import { presentSmsSentAlert } from '../../src/services/notificationService';
 
 const DEFAULT_EMERGENCY_MESSAGE =
   'EMERGÊNCIA! Preciso de ajuda urgente. Estou em situação de risco. Por favor, envie socorro imediatamente!';
@@ -129,6 +130,12 @@ export default function RiskAreaSection() {
       console.log('✅ SMS ENVIADO COM SUCESSO!');
       queryClient.invalidateQueries({ queryKey: ['riskAreas'] });
       queryClient.invalidateQueries({ queryKey: ['sms'] });
+
+      void presentSmsSentAlert({
+        ddd: variables.ddd,
+        phone: variables.numeroTelefone,
+        eventName: variables.nomeEvento,
+      });
 
       showMessage(
         'success',

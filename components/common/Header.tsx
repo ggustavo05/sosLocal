@@ -17,7 +17,7 @@ export default function Header({
   showBackButton,
   showThemeToggle = true,
 }: HeaderProps) {
-  const { colors, isDark, preference, toggleTheme, useSystemTheme } = useTheme();
+  const { colors, isDark, toggleTheme } = useTheme();
 
   const styles = useMemo(
     () =>
@@ -68,16 +68,6 @@ export default function Header({
           alignItems: 'center',
           justifyContent: 'center',
         },
-        systemLink: {
-          paddingHorizontal: 4,
-          paddingVertical: 6,
-        },
-        systemLinkText: {
-          color: colors.onPrimary,
-          fontSize: 11,
-          opacity: 0.95,
-          textDecorationLine: 'underline',
-        },
         placeholder: {
           width: 40,
         },
@@ -105,26 +95,14 @@ export default function Header({
 
         <View style={[styles.rightCluster, !onLogout && styles.rightClusterSolo]}>
           {showThemeToggle ? (
-            <>
-              <TouchableOpacity
-                style={styles.iconBtn}
-                onPress={() => void toggleTheme()}
-                accessibilityLabel={isDark ? 'Ativar tema claro' : 'Ativar tema escuro'}
-                accessibilityRole="button"
-              >
-                <Ionicons name={isDark ? 'sunny' : 'moon'} size={22} color={colors.onPrimary} />
-              </TouchableOpacity>
-              {preference !== 'system' ? (
-                <TouchableOpacity
-                  style={styles.systemLink}
-                  onPress={() => void useSystemTheme()}
-                  accessibilityLabel="Seguir tema do sistema"
-                  accessibilityRole="button"
-                >
-                  <Text style={styles.systemLinkText}>SO</Text>
-                </TouchableOpacity>
-              ) : null}
-            </>
+            <TouchableOpacity
+              style={styles.iconBtn}
+              onPress={() => void toggleTheme()}
+              accessibilityLabel={isDark ? 'Ativar tema claro' : 'Ativar tema escuro'}
+              accessibilityRole="button"
+            >
+              <Ionicons name={isDark ? 'sunny' : 'moon'} size={22} color={colors.onPrimary} />
+            </TouchableOpacity>
           ) : null}
           {onLogout ? (
             <TouchableOpacity style={styles.iconBtn} onPress={onLogout}>

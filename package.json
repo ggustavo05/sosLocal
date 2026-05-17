@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "main": "expo-router/entry",
   "scripts": {
+    "generate-build-info": "node scripts/generate-build-info.js",
+    "prestart": "npm run generate-build-info",
+    "preweb": "npm run generate-build-info",
     "start": "expo start --port 8081",
     "android": "expo run:android",
     "ios": "expo run:ios",
@@ -14,6 +17,7 @@
     "@tanstack/react-query": "^5.99.0",
     "expo": "~54.0.22",
     "expo-location": "~19.0.7",
+    "expo-notifications": "~0.32.17",
     "expo-router": "~6.0.14",
     "expo-status-bar": "~3.0.8",
     "react": "19.1.0",

@@ -1,15 +1,118 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Header from '../components/common/Header';
+import { useTheme } from '../src/theme';
 
 export default function OrientacoesTela() {
+  const { colors } = useTheme();
+
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
+        safeArea: {
+          flex: 1,
+          backgroundColor: colors.background,
+        },
+        container: {
+          flex: 1,
+          backgroundColor: colors.background,
+        },
+        scrollView: {
+          flex: 1,
+        },
+        scrollContent: {
+          padding: 20,
+          paddingBottom: 40,
+        },
+        section: {
+          marginBottom: 20,
+        },
+        headerSection: {
+          alignItems: 'center',
+          marginBottom: 30,
+          marginTop: 20,
+        },
+        mainTitle: {
+          fontSize: 28,
+          fontWeight: 'bold',
+          color: colors.primary,
+          marginTop: 15,
+          marginBottom: 10,
+          textAlign: 'center',
+        },
+        subtitle: {
+          fontSize: 16,
+          color: colors.textSecondary,
+          textAlign: 'center',
+          paddingHorizontal: 20,
+        },
+        card: {
+          backgroundColor: colors.surface,
+          borderRadius: 15,
+          padding: 20,
+          marginBottom: 15,
+          flexDirection: 'row',
+          alignItems: 'center',
+          shadowColor: colors.shadow,
+          shadowOffset: {
+            width: 0,
+            height: 2,
+          },
+          shadowOpacity: 0.1,
+          shadowRadius: 8,
+          elevation: 5,
+        },
+        cardIcon: {
+          width: 60,
+          height: 60,
+          borderRadius: 30,
+          backgroundColor: colors.surfaceSecondary,
+          justifyContent: 'center',
+          alignItems: 'center',
+          marginRight: 15,
+        },
+        cardContent: {
+          flex: 1,
+        },
+        cardTitle: {
+          fontSize: 18,
+          fontWeight: 'bold',
+          color: colors.text,
+          marginBottom: 5,
+        },
+        cardDescription: {
+          fontSize: 14,
+          color: colors.textSecondary,
+          lineHeight: 20,
+        },
+        backButtonBottom: {
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: colors.surface,
+          borderRadius: 10,
+          padding: 15,
+          marginTop: 20,
+          borderWidth: 1,
+          borderColor: colors.primary,
+        },
+        backButtonText: {
+          fontSize: 16,
+          color: colors.primary,
+          fontWeight: '600',
+          marginLeft: 8,
+        },
+      }),
+    [colors]
+  );
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        <Header showBackButton={true} onBack={() => router.back()} />
+        <Header showBackButton onBack={() => router.back()} />
         <ScrollView
           style={styles.scrollView}
           contentContainerStyle={styles.scrollContent}
@@ -17,13 +120,12 @@ export default function OrientacoesTela() {
         >
           <View style={styles.section}>
             <View style={styles.headerSection}>
-              <Ionicons name="shield-checkmark" size={32} color="#1B547D" />
+              <Ionicons name="shield-checkmark" size={32} color={colors.primary} />
               <Text style={styles.mainTitle}>Orientações de Segurança</Text>
               <Text style={styles.subtitle}>Escolha o tipo de evento para ver as orientações</Text>
             </View>
 
-            {/* Card Enchentes */}
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.card}
               onPress={() => router.push('/enchentes')}
               activeOpacity={0.7}
@@ -37,11 +139,10 @@ export default function OrientacoesTela() {
                   Saiba como agir antes, durante e após enchentes
                 </Text>
               </View>
-              <Ionicons name="chevron-forward" size={24} color="#999" />
+              <Ionicons name="chevron-forward" size={24} color={colors.textMuted} />
             </TouchableOpacity>
 
-            {/* Card Tempestades */}
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.card}
               onPress={() => router.push('/tempestades')}
               activeOpacity={0.7}
@@ -55,11 +156,10 @@ export default function OrientacoesTela() {
                   Proteção durante tempestades elétricas e granizo
                 </Text>
               </View>
-              <Ionicons name="chevron-forward" size={24} color="#999" />
+              <Ionicons name="chevron-forward" size={24} color={colors.textMuted} />
             </TouchableOpacity>
 
-            {/* Card Inundações */}
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.card}
               onPress={() => router.push('/inundacoes')}
               activeOpacity={0.7}
@@ -73,15 +173,11 @@ export default function OrientacoesTela() {
                   Orientações para situações de inundação
                 </Text>
               </View>
-              <Ionicons name="chevron-forward" size={24} color="#999" />
+              <Ionicons name="chevron-forward" size={24} color={colors.textMuted} />
             </TouchableOpacity>
 
-            {/* Botão Voltar */}
-            <TouchableOpacity 
-              style={styles.backButtonBottom}
-              onPress={() => router.back()}
-            >
-              <Ionicons name="arrow-back" size={20} color="#1B547D" />
+            <TouchableOpacity style={styles.backButtonBottom} onPress={() => router.back()}>
+              <Ionicons name="arrow-back" size={20} color={colors.primary} />
               <Text style={styles.backButtonText}>Voltar para Home</Text>
             </TouchableOpacity>
           </View>
@@ -90,101 +186,3 @@ export default function OrientacoesTela() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    padding: 20,
-    paddingBottom: 40,
-  },
-  section: {
-    marginBottom: 20,
-  },
-  headerSection: {
-    alignItems: 'center',
-    marginBottom: 30,
-    marginTop: 20,
-  },
-  mainTitle: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#1B547D',
-    marginTop: 15,
-    marginBottom: 10,
-    textAlign: 'center',
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#666',
-    textAlign: 'center',
-    paddingHorizontal: 20,
-  },
-  card: {
-    backgroundColor: '#fff',
-    borderRadius: 15,
-    padding: 20,
-    marginBottom: 15,
-    flexDirection: 'row',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 5,
-  },
-  cardIcon: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: '#f8f9fa',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 15,
-  },
-  cardContent: {
-    flex: 1,
-  },
-  cardTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 5,
-  },
-  cardDescription: {
-    fontSize: 14,
-    color: '#666',
-    lineHeight: 20,
-  },
-  backButtonBottom: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 15,
-    marginTop: 20,
-    borderWidth: 1,
-    borderColor: '#1B547D',
-  },
-  backButtonText: {
-    fontSize: 16,
-    color: '#1B547D',
-    fontWeight: '600',
-    marginLeft: 8,
-  },
-});
-
-

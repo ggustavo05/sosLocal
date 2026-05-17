@@ -6,6 +6,7 @@ import { getCurrentDeviceCoordinates } from '../../src/services/currentLocationS
 import { RiskArea } from '../../src/types/riskAreas';
 import type { ThemeColors } from '../../src/theme/types';
 import { useTheme } from '../../src/theme';
+import { useRiskProximityNotification } from '../../src/hooks/useRiskProximityNotification';
 
 let WebView: React.ComponentType<any> | null = null;
 if (Platform.OS !== 'web') {
@@ -213,6 +214,12 @@ export default function MapSection() {
     };
   }, [loading, resolveUserLocation]);
 
+  useRiskProximityNotification({
+    riskAreas,
+    userLocation,
+    enabled: !loading && !isError && userLocation != null && riskAreas.length > 0,
+  });
+
   const htmlContent = useMemo(
     () => generateMapHTML(riskAreas, userLocation, colors),
     [riskAreas, userLocation, colors]
@@ -413,7 +420,6 @@ export default function MapSection() {
           )}
           {!loading && !isError && (
             <>
-              {/* @ts-expect-error div no react-native-web */}
               <div
                 ref={mapRef as any}
                 id="leaflet-map"
@@ -423,7 +429,6 @@ export default function MapSection() {
                   minHeight: 300,
                 }}
               />
-              {/* @ts-expect-error legenda web */}
               <div
                 style={{
                   position: 'absolute',

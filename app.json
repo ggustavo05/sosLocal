@@ -15,7 +15,8 @@
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
-        "NSLocationWhenInUseUsageDescription": "O SOS Localiza usa sua localização em primeiro plano para exibir mapa e alertas na sua região, quando você permitir."
+        "NSLocationWhenInUseUsageDescription": "O SOS Localiza usa sua localização em primeiro plano para exibir mapa e alertas na sua região, quando você permitir.",
+        "NSUserNotificationsUsageDescription": "O SOS Localiza envia alertas locais quando você estiver próximo de área de alto risco ou após envio de SMS de emergência."
       }
     },
     "android": {
@@ -27,7 +28,8 @@
       "package": "com.anonymous.sosLocal",
       "permissions": [
         "ACCESS_COARSE_LOCATION",
-        "ACCESS_FINE_LOCATION"
+        "ACCESS_FINE_LOCATION",
+        "POST_NOTIFICATIONS"
       ]
     },
     "web": {
@@ -39,6 +41,15 @@
         "expo-location",
         {
           "locationWhenInUsePermission": "O SOS Localiza usa sua localização para mapa e alertas na sua região, quando você permitir."
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/icon.png",
+          "color": "#1B547D",
+          "defaultChannel": "alertas-sos",
+          "sounds": []
         }
       ]
     ]

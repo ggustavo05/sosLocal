@@ -1,15 +1,25 @@
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, ScrollView } from 'react-native';
 import React from 'react';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Header from '../components/common/Header';
+import { useGuidanceDetailStyles } from '../src/hooks/useGuidanceDetailStyles';
+
+const ACCENT = {
+  cardTitleColor: '#FFD700',
+  warningBorderColor: '#FFD700',
+  warningBoldColor: '#DAA520',
+  warningIconColor: '#FFD700',
+} as const;
 
 export default function TempestadesTela() {
+  const styles = useGuidanceDetailStyles(ACCENT);
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        <Header showBackButton={true} onBack={() => router.back()} />
+        <Header showBackButton onBack={() => router.back()} />
         
         <ScrollView
           style={styles.scrollView}
@@ -18,7 +28,7 @@ export default function TempestadesTela() {
         >
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Ionicons name="thunderstorm" size={24} color="#FFD700" />
+              <Ionicons name="thunderstorm" size={24} color={ACCENT.cardTitleColor} />
               <Text style={styles.sectionTitle}>Orientações para Tempestades</Text>
             </View>
             
@@ -116,7 +126,7 @@ export default function TempestadesTela() {
             </View>
 
             <View style={styles.warningCard}>
-              <Ionicons name="warning" size={28} color="#FFD700" />
+              <Ionicons name="warning" size={28} color={ACCENT.warningIconColor} />
               <Text style={styles.warningText}>
                 <Text style={styles.warningBold}>IMPORTANTE:</Text> Raios podem atingir até 16 km de distância 
                 da tempestade. Se você pode ouvir trovões, está em área de risco. 
@@ -130,106 +140,4 @@ export default function TempestadesTela() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 15,
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-  },
-  backButton: {
-    padding: 5,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-    flex: 1,
-    textAlign: 'center',
-  },
-  placeholder: {
-    width: 34,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    padding: 20,
-    paddingBottom: 40,
-  },
-  section: {
-    marginBottom: 20,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  sectionTitle: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#333',
-    marginLeft: 10,
-  },
-  card: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 18,
-    marginBottom: 15,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  cardTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#FFD700',
-    marginBottom: 12,
-  },
-  cardText: {
-    fontSize: 15,
-    color: '#555',
-    lineHeight: 24,
-  },
-  warningCard: {
-    backgroundColor: '#FFFACD',
-    borderRadius: 12,
-    padding: 20,
-    marginTop: 10,
-    borderLeftWidth: 4,
-    borderLeftColor: '#FFD700',
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-  },
-  warningText: {
-    fontSize: 15,
-    color: '#666',
-    lineHeight: 22,
-    marginLeft: 12,
-    flex: 1,
-  },
-  warningBold: {
-    fontWeight: 'bold',
-    color: '#DAA520',
-  },
-});
-
 
