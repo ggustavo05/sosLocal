@@ -36,9 +36,6 @@ yarn-error.*
 # typescript
 *.tsbuildinfo
 
-# hash do commit gerado no start/build
-src/constants/buildInfo.ts
-
 # generated native folders
 /ios
 /android
