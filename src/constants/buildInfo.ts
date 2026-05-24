@@ -2,6 +2,6 @@
  * Gerado automaticamente por scripts/generate-build-info.js — não editar à mão.
  * Commit de referência da versão em execução/build.
  */
-export const GIT_COMMIT_HASH = '4ab72e23980f2ae022be4ce0ca0e32d69fe7bae0';
-export const GIT_COMMIT_SHORT = '4ab72e2';
-export const BUILD_GENERATED_AT = '2026-05-23T19:31:00.783Z';
+export const GIT_COMMIT_HASH = 'baccc61f2c31b050c51d4702570473a6c560fc4b';
+export const GIT_COMMIT_SHORT = 'baccc61';
+export const BUILD_GENERATED_AT = '2026-05-24T01:01:56.996Z';

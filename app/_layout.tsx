@@ -7,6 +7,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import * as Notifications from 'expo-notifications';
 import { ThemeProvider, useTheme } from '../src/theme';
+import { loadWebIconFonts } from '../src/utils/loadWebIconFonts';
 import {
   configureNotificationHandler,
   initNotifications,
@@ -78,6 +79,12 @@ function AppNavigation() {
 }
 
 export default function RootLayout() {
+  useEffect(() => {
+    if (Platform.OS === 'web') {
+      void loadWebIconFonts();
+    }
+  }, []);
+
   return (
     <SafeAreaProvider>
       <ThemeProvider>
